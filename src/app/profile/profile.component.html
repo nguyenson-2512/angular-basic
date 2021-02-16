@@ -1,0 +1,12 @@
+<div *ngIf="userData">
+  <div class="card ml-4 mt-4" style="width: 18rem;">
+    <div class="card-header">
+      Profile
+    </div>
+    <ul class="list-group list-group-flush">
+      <li class="list-group-item">Username: {{userData.username}}</li>
+      <li class="list-group-item">Email: {{userData.email}}</li>
+      <li class="list-group-item">Create at: {{userData.createdAt | date}}</li>
+    </ul>
+  </div>
+</div>
