@@ -1,8 +1,17 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from '../services/auth.service';
 import { TokenStorageService } from '../services/token-storage.service';
 import { PostService } from '../services/post.service';
+
+import { Store } from '@ngrx/store';
+import * as authActions from '../store/actions/auth.actions';
+import * as fromRoot from '../store';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
+
+import { NgForm } from '@angular/forms';
+
 
 @Component({
   selector: 'app-login',
@@ -23,6 +32,29 @@ export class LoginComponent implements OnInit {
     private authService: AuthService,
     private tokenStorage: TokenStorageService
   ) {}
+
+  // model: User = new User();
+  // destroy$: Subject<boolean> = new Subject<boolean>();
+
+  // constructor(private router: Router, private readonly store: Store) {
+  //   this.store.select(fromRoot.userLogin).pipe(
+  //     takeUntil(this.destroy$)
+  //   ).subscribe(data => {
+  //     console.log('data::::', data);
+  //     if (data.isLoadingSuccess && data.result.status) {
+  //       this.router.navigate(['/profile']);
+  //     }
+  //   });
+  // }
+
+  // onSubmit() {
+  //   this.store.dispatch(authActions.login({user: { username: this.model.username, password: this.model.password }}));
+  // }
+
+//   ngOnDestroy(){
+//     this.destroy$.next(true);
+//     this.destroy$.unsubscribe();
+// }
 
   ngOnInit(): void {
     if (this.tokenStorage.getToken()) {

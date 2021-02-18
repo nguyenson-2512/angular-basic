@@ -6,7 +6,7 @@ export const environment = {
   production: false,
   apiUrl: 'http://localhost:5000/api/',
   TOKEN_KEY: 'auth-token',
-  USER_KEY: 'auth-user',
+  USER_KEY: 'user',
 };
 
 /*
