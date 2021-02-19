@@ -8,7 +8,7 @@ import {
 import { localStorageSync } from 'ngrx-store-localstorage';
 import { environment } from '../../environments/environment';
 import * as fromUser from './reducers/auth.reducers';
-import * as fromPost from './reducers/post.reducer';
+import * as fromPost from './reducers/post.reducers';
 
 export interface State {
   user: fromUser.State;
@@ -20,7 +20,7 @@ export const reducers: ActionReducerMap<State> = {
   post: fromPost.reducer,
 };
 
-const reducerKeys = ['user', 'todo'];
+const reducerKeys = ['user', 'post'];
 export function localStorageSyncReducer(reducer: ActionReducer<any>): ActionReducer<any> {
   return localStorageSync({keys: reducerKeys})(reducer);
 }

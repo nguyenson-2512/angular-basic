@@ -1,38 +1,100 @@
 import { Component, OnInit } from '@angular/core';
-import { TokenStorageService } from '../services/token-storage.service';
-import { AuthService } from '../services/auth.service';
+import { Router } from '@angular/router';
+import { takeUntil } from 'rxjs/operators';
+import { Subject } from 'rxjs';
+import { Store } from '@ngrx/store';
+
 import { PostService } from '../services/post.service';
+import * as postActions from '../store/actions/post.actions';
+import * as fromRoot from '../store';
 
 @Component({
   selector: 'app-home',
   templateUrl: './home.component.html',
-  styleUrls: ['./home.component.css']
+  styleUrls: ['./home.component.css'],
 })
 export class HomeComponent implements OnInit {
+  user;
   isLoggedIn = false;
   isEditing = false;
-  idEditing: string = ''
-  listOfPosts = [] ;
+  idEditing: string = '';
+  listOfPosts = [];
   postForm: any = {
     title: null,
     description: null,
-    image: null
-  }
-
-  constructor(
-    private postService: PostService,
-    private authService: AuthService,
-    private tokenStorage: TokenStorageService
-  ) { }
+    image: null,
+  };
 
   ngOnInit(): void {
-    if (this.tokenStorage.getToken()) {
-      this.isLoggedIn = true;
-    }
-    this.postService.getAllPosts().subscribe(
-      (data) => {
-        this.listOfPosts = data.data;
-        console.log('---posts:', this.listOfPosts)
+
+  }
+
+  destroy$: Subject<boolean> = new Subject<boolean>();
+
+  constructor(
+    private router: Router,
+    private readonly store: Store,
+    private postService: PostService
+  ) {
+    this.store
+    .select(fromRoot.getLoggedInUser)
+    .pipe(takeUntil(this.destroy$))
+    .subscribe((data) => {
+      console.log('user', data)
+      this.user = data.user
+      this.isLoggedIn = true
+    });
+
+  this.store.dispatch(postActions.getPosts());
+
+  this.store
+    .select(fromRoot.getPosts)
+    .pipe(takeUntil(this.destroy$))
+    .subscribe((data) => {
+      this.listOfPosts = data.posts
+      console.log('data: ',data )
+    } );
+  }
+
+  createPost() {
+    const newPost = {
+      title: this.postForm.title,
+      description: this.postForm.description,
+      image: this.postForm.image,
+    };
+    this.store.dispatch(postActions.createPost({ post: newPost }));
+  }
+
+  deletePost(postid: string) {
+    console.log('deleting this post:::', postid);
+    this.store.dispatch(postActions.deletePost({ postid }));
+  }
+
+  editPost() {
+    this.store.dispatch(
+      postActions.editPost({
+        post: {
+          _id: this.idEditing,
+          title: this.postForm.title,
+          description: this.postForm.description,
+          image: this.postForm.image,
+        },
+      })
+    );
+  }
+
+
+  ngOnDestroy() {
+    this.destroy$.next(true);
+    this.destroy$.unsubscribe();
+  }
+
+
+  deleteAllPosts(): void {
+    this.postService.deleteAll().subscribe(
+      (res) => {
+        console.log('--', res);
+        this.listOfPosts.length = 0;
       },
       (err) => {
         console.log(err);
@@ -40,69 +102,14 @@ export class HomeComponent implements OnInit {
     );
   }
 
-  createPost(): void {
-    this.postService.createPost(this.postForm.title, this.postForm.description, this.postForm.image).subscribe(
-      res => {
-        console.log('--',res['data'])
-        this.listOfPosts.push(res['data'])
-      },
-      err => {
-        console.log(err)
-      }
-    )
-  }
-
-  deletePost(id: string): void {
-    this.postService.deletePost(id).subscribe(
-      res => {
-        this.listOfPosts = this.listOfPosts.filter(p =>  p._id !== id)
-        console.log('--',res)
-      },
-      err => {
-        console.log(err)
-      }
-    )
-  }
-
-  deleteAllPosts(): void {
-    this.postService.deleteAll().subscribe(
-      res => {
-        console.log('--',res)
-        this.listOfPosts.length = 0
-      },
-      err => {
-        console.log(err)
-      }
-    )
-  }
-
   toggleEditPost(id: string): void {
-    this.isEditing = true
-    this.idEditing = id
+    this.isEditing = true;
+    this.idEditing = id;
   }
 
-  editPost(): void {
-    this.postService.editPost(this.idEditing,this.postForm.title, this.postForm.description, this.postForm.image).subscribe(
-      res => {
-        console.log('--',res)
-        window.location.reload();
-        // const index = this.listOfPosts.findIndex((p) => p._id === this.idEditing);
-        // console.log('index',index)
-        // this.listOfPosts = [
-        //   ...this.listOfPosts.slice(0, index),
-        //     ...res['post'],
-        //   ...this.listOfPosts.slice(index + 1),
-        // ];
-      },
-      err => {
-        console.log(err)
-      }
-    )
-  }
 
   handleCancel(): void {
-    this.isEditing = false
-    this.idEditing = null
+    this.isEditing = false;
+    this.idEditing = null;
   }
-
 }

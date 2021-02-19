@@ -32,21 +32,23 @@ const postReducer = createReducer(
 
   on(postActions.createPost, (state, {post}) => ({...state, isLoading: true, currentPost: post})),
   on(postActions.createPostSuccess, (state, result) => {
+    console.log('result:::', result)
     const posts = undefined !== state.posts ? _.cloneDeep(state.posts) : [];
     const currentPost = undefined !== state.currentPost ? _.cloneDeep(state.currentPost) : {};
-    currentPost.id = result.postId;
+    currentPost._id = result.data._id;
     posts.push(currentPost);
     return {
       posts,
       isLoading: false,
       isLoadingSuccess: true
-    };
+    }}),
 
   on(postActions.deletePost, (state, {postid}) => ({...state, isLoading: true, deletePostId: postid})),
   on(postActions.deletePostSuccess, (state, result) => {
+    console.log('result:::', result)
     let posts = undefined !== state.posts ? _.cloneDeep(state.posts) : [];
-    if (result.status) {
-      posts = posts.filter(post => post.id !== state.deletePostId);
+    if (result.message === "Post deleted!") {
+      posts = posts.filter(post => post._id !== state.deletePostId);
     }
     return {
       posts,
@@ -60,7 +62,7 @@ const postReducer = createReducer(
     let posts = undefined !== state.posts ? _.cloneDeep(state.posts) : [];
     const currentPost = undefined !== state.currentPost ? _.cloneDeep(state.currentPost) : {};
     posts = posts.map(post => {
-      if (post.id === currentPost.id) {
+      if (post._id === currentPost._id) {
         post = currentPost;
       }
       return post;

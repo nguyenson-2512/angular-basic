@@ -1,8 +1,6 @@
-<!-- <app-register></app-register> -->
-<!-- <app-login></app-login> -->
 <div id="app">
   <nav class="navbar navbar-expand navbar-dark bg-primary">
-    <a href="#" class="navbar-brand">Angular</a>
+    <a href="/home" class="navbar-brand">Angular</a>
     <ul *ngIf="isLoggedIn" class="navbar-nav mr-auto" routerLinkActive="active">
       <li class="nav-item">
         <a href="/home" class="nav-link" routerLink="home">Home </a>
@@ -10,9 +8,6 @@
       <li class="nav-item">
         <a href="/profile" class="nav-link" routerLink="profile">Profile </a>
       </li>
-      <!-- <li class="nav-item">
-        <a href="/user" class="nav-link" *ngIf="isLoggedIn" routerLink="user">User</a>
-      </li> -->
     </ul>
 
     <ul class="navbar-nav ml-auto" *ngIf="!isLoggedIn">
@@ -25,9 +20,6 @@
     </ul>
 
     <ul class="navbar-nav ml-auto" *ngIf="isLoggedIn">
-      <!-- <li class="nav-item">
-        <a href="/profile" class="nav-link" routerLink="profile">{{ username }}</a>
-      </li> -->
       <li class="nav-item">
         <a href class="nav-link" (click)="logout()">LogOut</a>
       </li>

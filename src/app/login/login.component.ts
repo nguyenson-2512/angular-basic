@@ -12,7 +12,6 @@ import { takeUntil } from 'rxjs/operators';
 
 import { NgForm } from '@angular/forms';
 
-
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
@@ -27,34 +26,40 @@ export class LoginComponent implements OnInit {
   isLoginFailed = false;
   errorMessage = '';
 
+  destroy$: Subject<boolean> = new Subject<boolean>();
+
   constructor(
-    public router: Router,
-    private authService: AuthService,
+    private router: Router,
+    private readonly store: Store,
     private tokenStorage: TokenStorageService
-  ) {}
+  ) {
+    this.store
+      .select(fromRoot.userLogin)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((data) => {
+        console.log('data::::', data);
+        if (data.isLoadingSuccess && data.result.data.token) {
+          this.tokenStorage.saveToken(data.result['data'].token);
+          this.tokenStorage.saveUser(data.result['data'].user);
+          this.isLoginFailed = false;
+          this.isLoggedIn = true;
+          this.router.navigate(['/home']);
+        }
+      });
+  }
 
-  // model: User = new User();
-  // destroy$: Subject<boolean> = new Subject<boolean>();
+  onSubmit() {
+    this.store.dispatch(
+      authActions.login({
+        user: { username: this.form.username, password: this.form.password },
+      })
+    );
+  }
 
-  // constructor(private router: Router, private readonly store: Store) {
-  //   this.store.select(fromRoot.userLogin).pipe(
-  //     takeUntil(this.destroy$)
-  //   ).subscribe(data => {
-  //     console.log('data::::', data);
-  //     if (data.isLoadingSuccess && data.result.status) {
-  //       this.router.navigate(['/profile']);
-  //     }
-  //   });
-  // }
-
-  // onSubmit() {
-  //   this.store.dispatch(authActions.login({user: { username: this.model.username, password: this.model.password }}));
-  // }
-
-//   ngOnDestroy(){
-//     this.destroy$.next(true);
-//     this.destroy$.unsubscribe();
-// }
+  ngOnDestroy() {
+    this.destroy$.next(true);
+    this.destroy$.unsubscribe();
+  }
 
   ngOnInit(): void {
     if (this.tokenStorage.getToken()) {
@@ -62,30 +67,30 @@ export class LoginComponent implements OnInit {
     }
   }
 
-  onSubmit(): void {
-    const { username, password } = this.form;
-    this.authService.login(username, password).subscribe(
-      (res) => {
-        this.tokenStorage.saveToken(res['data'].token);
-        this.tokenStorage.saveUser(res['data'].user);
+  // onSubmit(): void {
+  //   const { username, password } = this.form;
+  //   this.authService.login(username, password).subscribe(
+  //     (res) => {
+  //       this.tokenStorage.saveToken(res['data'].token);
+  //       this.tokenStorage.saveUser(res['data'].user);
 
-        this.isLoginFailed = false;
-        this.isLoggedIn = true;
-        this.navigate();
-        // this.reloadPage()
-      },
-      (err) => {
-        this.errorMessage = err.error.message;
-        this.isLoginFailed = true;
-      }
-    );
-  }
+  //       this.isLoginFailed = false;
+  //       this.isLoggedIn = true;
+  //       this.navigate();
+  //       // this.reloadPage()
+  //     },
+  //     (err) => {
+  //       this.errorMessage = err.error.message;
+  //       this.isLoginFailed = true;
+  //     }
+  //   );
+  // }
 
-  reloadPage(): void {
-    window.location.reload();
-  }
+  // reloadPage(): void {
+  //   window.location.reload();
+  // }
 
-  navigate() {
-    this.router.navigate(['/home']);
-  }
+  // navigate() {
+  //   this.router.navigate(['/home']);
+  // }
 }

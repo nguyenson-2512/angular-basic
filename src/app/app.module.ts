@@ -7,7 +7,6 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { StoreModule } from '@ngrx/store';
 import { StoreDevtoolsModule } from '@ngrx/store-devtools';
 import { reducers, metaReducers } from './store'
-// import * as authReducer from './store/index'
 import { AuthEffects } from './store/effects/auth.effects';
 import { EffectsModule } from '@ngrx/effects';
 
@@ -20,6 +19,7 @@ import { HomeComponent } from './home/home.component';
 
 import { authInterceptorProviders } from './helper/auth.interceptor';
 import { AuthGuardService } from './services/auth-guard.service'
+import { PostEffects } from './store/effects/post.effects';
 
 @NgModule({
   declarations: [
@@ -35,11 +35,12 @@ import { AuthGuardService } from './services/auth-guard.service'
     BrowserAnimationsModule,
     FormsModule,
     HttpClientModule,
-    StoreDevtoolsModule.instrument(),
     StoreModule.forRoot(reducers, {
       metaReducers
     }),
-    EffectsModule.forRoot([AuthEffects])
+    EffectsModule.forRoot([AuthEffects,PostEffects]),
+    StoreDevtoolsModule.instrument(),
+
   ],
   providers: [authInterceptorProviders, AuthGuardService],
   bootstrap: [AppComponent]

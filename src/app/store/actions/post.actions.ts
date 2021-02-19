@@ -34,7 +34,7 @@ export const getPostsFailure = createAction(
 
 export const createPost = createAction(
   CREATE_POST,
-  props<{post: any}>()
+  props<{post: Post}>()
 );
 
 export const createPostSuccess = createAction(
@@ -64,7 +64,7 @@ export const deletePostFailure = createAction(
 
 export const editPost = createAction(
   EDIT_POST,
-  props<{post: any}>()
+  props<{post: Post}>()
 );
 
 export const editPostSuccess = createAction(
